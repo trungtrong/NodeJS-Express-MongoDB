@@ -1,0 +1,201 @@
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e0"),
+	"email" : "mai01@gmail.com",
+	"courseCount" : 4,
+	"username" : "Mai",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	},
+	"score" : [
+		10,
+		34,
+		23
+	]
+}
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e1"),
+	"email" : "tuan02@gmail.com",
+	"courseCount" : 2,
+	"username" : "Tuan",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	}
+}
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e2"),
+	"email" : "lan@gmail.com",
+	"courseCount" : 2,
+	"username" : "Lan",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	}
+}
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e3"),
+	"email" : "tien@gmail.com",
+	"courseCount" : 6,
+	"username" : "Tien",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	},
+	"lastLogin" : [
+		"Monday",
+		"Wednesday",
+		"Tuesday"
+	],
+	"score" : [
+		10,
+		34,
+		23
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e6"),
+	"item" : "journal",
+	"instock" : [
+		{
+			"warehouse" : "A",
+			"qty" : 5
+		},
+		{
+			"warehouse" : "C",
+			"qty" : 15
+		}
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e7"),
+	"item" : "notebook",
+	"instock" : [
+		{
+			"warehouse" : "C",
+			"qty" : 5
+		}
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e8"),
+	"item" : "paper",
+	"instock" : [
+		{
+			"warehouse" : "A",
+			"qty" : 60
+		},
+		{
+			"warehouse" : "B",
+			"qty" : 15
+		}
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e9"),
+	"item" : "planner",
+	"instock" : [
+		{
+			"warehouse" : "A",
+			"qty" : 40
+		},
+		{
+			"warehouse" : "B",
+			"qty" : 5
+		}
+	]
+}
+
+            ------------------------------------
+
+            12-1: Normal Query all Documents in a Collection
+              with Equality Condition
+
+> db.studentData.find(
+    {
+      item: "planner"
+    }
+  )
+
+  ====> Response:
+  {
+    "_id" : ObjectId("5d96b01e02ddc31daa2051e9"),
+    "item" : "planner",
+    "instock" : [
+      { "warehouse" : "A", "qty" : 40 },
+      { "warehouse" : "B", "qty" : 5 }
+    ]
+  }
+
+            12-2: Using { $in } operator
+  =. Syntax:
+    { field_of_document:
+      {
+        $in: [<value1>, <value2>, ... <valueN> ]
+      }
+    }
+
+  =>  to select the documents where the value of a field equals
+      any value in the array of { $in }
+
+> db.studentData.find(
+    {
+      courseCount: {
+        $in: [ 2, 4 ]
+      }
+    }
+  )
+=====> Choose all the documents that contains
+      "courseCount" either equal 2 OR 4
+
+      ------------------------------------
+
+      12-2: Specify AND Conditions
+
+> db.studentData.find(
+    {
+      courseCount: 2,
+      "profilePic.width": {
+        $lte: 100
+      }
+    }
+  )
+
+=====> include 2 conditions:
+      + courseCount = 2
+      + profilePic.width: <=100
+
+      ------------------------------------
+
+      12-2: Specify OR Conditions: using $or
+
+Syntax:
+    {
+      $or: [
+        { <expression1> },
+        { <expression2> },
+        ... , { <expressionN> }
+      ]
+    }
+
+> db.studentData.find(
+    {
+      $or: [
+        {
+          courseCount: 2
+        },  // OR
+        {
+          "profilePic.width": {
+            $lte: 100
+          }
+        }
+      ]
+    }
+  )
+
+  =====> Either courseCount = 2
+         Or profilePic.width: <=100

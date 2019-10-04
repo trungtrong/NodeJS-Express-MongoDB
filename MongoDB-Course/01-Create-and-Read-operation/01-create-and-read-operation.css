@@ -1,0 +1,102 @@
+    1 - Start
+1-1 - In first Terminal: run MongoDB server
+  > mongod
+
+1-2  - In second Terminal:
+  1 - 2 -1:
+  > mongo
+  and (Ctrl + L) : to clear screen
+
+  - Show all Databases:
+  > show dbs
+
+  1 - 2 - 1: Must go to your own Database
+  - Create or Switch my own Database for my lesson:
+            STUDENTS database name
+
+  a-
+  > use students  : to switch (come to { students database })
+      and
+  b-
+  > show dbs : The { students database } don't appear now
+    + until we create and push data to { students database name}
+  b- To see current database
+  > db
+    => it will print "students"
+
+    --------------------------------------------------------------------------------
+2 - CREATE Operations in Your Own Database: students
+
+    2-1- Create or Insert operations add new documents to a collection.
+
+    + If the collection does not currently exist,
+    insert operations will create the Collection
+
+  <SYNTAX- CREATE or INSERT>
+
+    2-2 - To add 1 document to 1 COLLECTION:
+
+    db.<name_collection>.insertOne(
+      {
+        name: "Mai",
+        email: "mai01@gmail.com",
+        contact: "03 Le Loi",
+        courseCount: 4,
+        isVerified: true
+      })
+  NOTE: You need a white space between the { key and value }
+    => If no, it makes a double code
+
+    2-3 - To add Array of Documents to 1 Collection
+
+    db.<name_collection>.insertMany([
+      {
+        name: "Mai",
+        email: "mai01@gmail.com",
+        contact: "03 Le Loi",
+        courseCount: 4,
+        isVerified: true
+      },
+      {
+        name: "Tuan",
+        email: "Tuan02@gmail.com",
+        contact: "04 Nguyen Van Thoai",
+        courseCount: 2,
+        isVerified: true
+      }]
+    )
+
+  If successful, we will receive
+      {
+	"acknowledged" : true,
+	"insertedIds" : [
+		ObjectId("5d95ab23e605814b816619d9"),
+		ObjectId("5d95ab23e605814b816619da")
+	]
+}
+
+            ----------------------------------------
+
+                    3 - <READ>
+
+  3 - 1: Get Row (all Documents in my Collection)
+    > db.<name_collection>.find(filter, projection)
+
+    Ex: Get all rows that match < filter >
+         db.studentData.find({email: "lan@gmail.com"})
+
+  => Result:
+      { "_id" : ObjectId("5d95c49fe605814b816619e2"), "email" : "lan@gmail.com", "courseCount" : 2, "username" : "Lan" }
+
+  3 - 2: To see easier as the Format
+    > db.<name_collection>.find(filter).pretty()
+
+  3 - 3: Get ONLY first one that matches
+    db.<name_collection>.findOne(data, options)
+
+  or the firstdocument
+    db.<name_collection>.findOne()
+
+  NOTE:
+
+https://docs.mongodb.com/manual/reference/operator/query/

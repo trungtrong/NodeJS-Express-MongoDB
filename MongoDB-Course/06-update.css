@@ -1,0 +1,45 @@
+1 - UPDATE first one that must MATCHES Info
+  db.<name_collection>.updateOne(filter, update,options)
+
+  + <update> use <Operator Expressions> with <dollar sign: $ >
+
+  + $set : add
+  + $unset: remove
+  + $replaceRoot
+
+    Ex:
+    db.studentData.updateOne(
+      {email: "Tuan02@gmail.com"},
+      {$set: {fbloggedIn: "yes"}}
+    )
+
+    => Response :
+      { "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
+    => Review:
+      {
+	      "_id" : ObjectId("5d95ab23e605814b816619da"),
+	      "name" : "Tuan",
+	      "email" : "Tuan02@gmail.com",
+	      "contact" : "04 Nguyen Van Thoai",
+	      "courseCount" : 2,
+	      "isVerified" : true,
+	      "fbloggedIn" : "yes"
+      }
+
+
+2 - UPDATE ALL that must MATCHES Info
+
+  db.<name_collection>.updateMany(filter, update,options)
+
+  Ex: db.studentData.updateMany(
+    {},
+    {$set: { present: true }}
+  )
+
+  => Response:
+    { "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+
+3 - UPDATE ALL that must MATCHES Info
+
+  db.<name_collection>.replaceOne(filter, update,options)

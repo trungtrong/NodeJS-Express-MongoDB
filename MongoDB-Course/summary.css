@@ -1,0 +1,295 @@
+                    LESSON 1: Introduced MongoDB
+
+  1 - Install MongoDB
+      1-1. Download MongoDB CommunityServer at Server tab
+          https://www.mongodb.com/download-center/community
+          +
+        + MongoDB is as runs as a service so it'll run in the background
+        + It'll also come with COMPASS which is a graphical tool
+
+      1-2: Download MongoDB Compass: at Tool tab
+
+-----------------------------------------------------------------------
+                    LESSON 2: Why MongoDb?
+
+  - MongoDB stores data in flexible, JSON-like documents
+  - The documents model maps to the Objects in your application code,
+    making data easy to work with.
+
+  NOTE: MongoDB like all the databases in the world. That means, It have PROS and COS
+
+  - MongoDB is a (phan phat)distributed database at its core,
+    + so high availability,
+    + horizontal scaling,
+    + and geographic distribution are built in and easy to use.
+
+2 - A few of Companies that use MongoDB is
+  + Ebay
+  + Amazon
+  + Royal Banks of Scotlar
+
+-----------------------------------------------------------------------
+                    LESSON 3: How does MongoDB works?
+
+  1 - There are 2 things about MongoDB
+    + One there is NO SCHEMA (means Diagram of Dadabase)
+    + Second, MongoDB is the COLLECTIONS of documents
+
+  2 - We have so much of flexibility in MongoDB
+    + There are no strict table  but surely it can be you can implement
+      strict tables as of default. There are no strict.
+
+    =>  That means: MongoDB actually focuses on storing everything together
+
+    2-1 =>  + While if you're coming up from the relational databases. (MySQL, SQL ).  That's not the case.
+      + In the case in relational databases, we put everything into its own tables. And these tables have certain relations with each other and then we pull up the data
+
+    2-2 => While, MongoDB store everything ar one place on just ONE DOCUMENT
+    + Surely there are multiple documents. But moreover the focus is on simply storing in one documents
+    + ====> What it allows us it may look like a huge Object or
+            looks like a bit messy thing
+            + But pulling up the data is absolutely FAST in MongoDB
+
+
+  3- NO SCHEMA: The flexibility in MongoDB
+    See: We have
+      id: 1, "name": "hitesh", "course":"mongoDB"
+
+    NOTE:
+      +  You can add certain fields, you can omit certain fields
+      + But it heavily depends on the implementation of what you are trying to do. Certainly RESTRICTIONS can be achieved
+
+  4 - MongoDo usually focus on Collection of Document.
+
+  + MongoDb is absolutely amazing when you have heavy read and write
+    operation and MongoDB is very less in the Cost as compared to      relational databases
+
+    -  MongoDB is a tool that can create multiple databases
+    MongoDB allow you to create separate instance of databases
+    + That means: We have
+     Databases #1 (for Project 1)
+     Databases #2 (for project 2)
+
+  - MongoDB is a COLLECTION of Documents.
+    Ex: Here is the quick example of Collection of Document
+    In Database #1, we have multiple collections
+    + Collection of Users = {John, Rahul, Alice}
+
+    + Collection of Courses = {JS, Android, NodeJS}
+
+====> Collection: is a set of Documents that have the same feature
+
+  5 - MongoDB diagram (see on notebook  in page MongoDB-1)
+
+
+-----------------------------------------------------------------------
+                LESSON 4:  What is mocha and need of mocha in MongoDb
+                mocha /'mou ka/
+    https://mochajs.org/
+  4 - 1: What is Mocha?
+    - Mocha is the TESTING Framework
+    Mocha is a feature-rich JavaScript test framework running on Node.js and in the browser, making asynchronous testing simple and fun. Mocha tests run serially, allowing for flexible and accurate reporting, while mapping uncaught exceptions to the correct test cases
+
+-----------------------------------------------------------------------
+                LESSON 5: Big Umbrella of MongoDB
+
+  1 - NOTE: MongoDB is also a company
+
+  2 - MongoDB umbrella consists of services :
+    + Community / Enterprise: just a database
+    + Atlas
+    + Mobile
+    + Ops Manager
+    + BI Connector
+    + MongoDB Charts
+    + Compass - GUI
+
+  - And Third-party Services is a { Robomongo/ Robo 3T GUI }
+    + https://robomongo.org
+
+      2-1- Mongo Atlas: is like MongoDB in CLOUD
+
+  3- MongoDB umbrella Stitch
+    + Query API
+    + Serverless function
+    + DB triggers
+    + Real Time Sync
+
+-----------------------------------------------------------------------
+                LESSON 6: ObjectID and BSON
+https://www.mongodb.com/json-and-bson
+
+1 -  BSON
+  - JSON is a small set
+  - BSON is a huge set
+    + BSON extends the JSON model to provide additonal data types,
+      ordered fields, and to be efficient for Encoding and Decoding within different languages
+
+    + BSON helps MongoDB to save and be efficient about your data
+
+
+2 - ObjectID
+    See: after we insert a Document into a Collection, we receive
+
+    {
+	"acknowledged" : true,
+	"insertedIds" : [
+		ObjectId("5d95ab23e605814b816619d9"),
+		ObjectId("5d95ab23e605814b816619da")
+	]
+}
+
+=>  In the JSOn data, Object ID is not recognized as a Valid field
+=> ObjectID is a true validation that MongoDB is storing all of my
+    data as BSON, not as a JSON
+    + and this < _id: ObjectID> is generated automatically by MongoDB
+
+  NOTE: The ObjectID must be unique
+
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------
+                      LESSON 12: What is Schema? /ski ,mow/
+
+  1 - Schema:
+    + Schema is nothing but the kind of arrangement. You can consider
+    this as an arrangement
+    + And Schema is necessary b/c it keeps all of your data in check
+      And while making it query for looking up for any king of data
+      into the database => It makes the process less costly and ,uch more efficient, to give you another
+
+    + Schema is nothing more than just a structure
+
+-----------------------------------------------------------------------
+              LESSON 13: Modeling database
+
+  1 -  For normal database (MySQL, SQL)
+    - Database modeling is a concept of preparing your tables.
+    - Whenever we design any application, usually the tutorial or a simple course, We just focus on creating 3 or 4 tables
+      => We usually ask myself,
+        + What kind of table should I create
+        + What kind of object should I create
+        + what kind of data type should I mention in that object
+
+    ======> All of the above stuff is Schema
+
+  2 - But MongoDB is no schema, it's flexible
+
+-----------------------------------------------------------------------
+            LESSON 14: Relation in database MongoDB
+
+1 - What is relation ?
+  - Relation is a way in which your one <document > interacts with another <document >
+
+2 - Let's create <youtube Database>
+  > use youtube
+
+  2 - 1: In { youtube } database, we have the collections
+    + <users collection>
+  > db.users.insertOne({
+      name: "Mai",
+      video: {
+        topic: "Fun Topic",
+        length: 4  // 4 minutes length of videos that user saw
+      }
+    })
+
+  2 - 2: We will be separating <users collection> and <videos     collection> itself
+         => We need to learn how we can link them up as well
+  + Create <person collection>
+  > db.persons.insertOne({
+      name: "Mai",
+      isVerified: true,
+      earning: 3000 // earning
+    })
+
+  2 - 3: Create <videos collection>
+  > db.videos.insertOne({
+      topic: "Fun One",
+      length: 4,
+      creator: ObjectId("5d96105f9dda3101472ac9fe")
+      // the ObjectId of <that above person> who make this video
+    })
+
+=======> We have <2 Documents>
+  + the ID of <One document> person "Mai" is linked with
+      another documents <video Fun One> using ID
+
+                ------------------------------------
+
+            13-2: One to many Relation in MongoDB
+
+For ex:
+  - I am a user. I'm creating multiple videos classic.
+  - Where one user result is associated with many products (videos or courses, ...)
+  - One user can produce a lot of videos
+  - One user can make a lot of comments
+  - One video can get a lot of comments
+
+13-2-1: Let's create and switch <Comments Database>
+
+13-2-2: Create <Comment Collection>
+  with below document
+  > db.comment.insertOne({
+      videoname: "react js",
+      comment: "How to install reactjs",
+      replies: [
+        "rep12",  // id of reply content
+        "rep13"
+      ]
+    })
+====> One Video have too many Comments (ID of comments )
+
+13-2-4: Create <replies Collection>
+  >  db.replies.insertMany([
+    {
+      _id: "rep12",
+      text: "hello guys"
+    },
+    {
+      _id: "rep13",
+      text: "You can learn Node JS"
+    }
+  ])
+            ------------------------------------
+
+            13-3: Many to many Relation in MongoDB
+
+13-3-1. Create <Udemy  database>
+
+  > use udemy
+
+13-3-2. Create <courses Collection>
+  > db.courses.insertOne({
+      name: "node js",
+      price: 12.0
+    })
+
+  => Response:
+        {
+	        "acknowledged" : true,
+	        "insertedId" : ObjectId("5d961c519dda3101472aca02")
+        }
+
+13-3-3. Create <users Collection>
+  > db.users.insertOne(
+      {
+        name: "Trong",
+        isVerified: true
+      }
+    )
+
+  <IDEA: User Trong have ID of Node JS Course>
+
+  > db.users.updateOne(
+      {},
+      {
+        $set: {
+          purchaseList: [
+            {
+              purchaseId: ObjectId("5d961c519dda3101472aca02")
+            }
+          ]
+        }
+      }
+    )

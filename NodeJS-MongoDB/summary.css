@@ -1,0 +1,256 @@
+          1 - Creating our first Student Schema
+          <app/student.js>
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+const StudentShema = new Schema({
+  name: String
+});
+
+const Student = mongoose.model("student", StudentShema);
+
+// export
+module.exports = Student;
+
+--------------------------------------------------------------------
+            2 - TEST: Connecting with mongodb with mongoose
+            <test/mo_helper_test.js>
+const mongoose = require('mongoose');
+
+/*
+  create { mongotube database }
+*/
+mongoose.connect(
+  "mongodb://localhost/mongotube",
+  { useNewUrlParser: true }
+);
+
+/*
+ connect
+*/
+mongoose.connection
+    .once('open', () => console.log("Connected"))
+    .on('error', () => console.log("Your Error", error));
+
+/*
+  + once() and on() is also  a Promise
+    is Events of NodeJS.EventEmitter
+
+  + once() and on() are listener to the events
+    whatever the event is happening
+  + Whether that's a successful event or fail event
+*/
+
+--------------------------------------------------------------------
+
+        3 - TEST: Blue bird and Q promises
+
+--------------------------------------------------------------------
+
+        4 - TEST: Hooks in mocha
+  <test/mo_helper_test.js>
+const mongoose = require('mongoose');
+
+mongoose.Promise = global.Promise; // ES6- promise
+
+/*
+  - in this before , that means whatever happens, this is the helper file
+  which is gonna run for the very first
+*/
+before((done) => {
+  mongoose.connect(
+    "mongodb://localhost/mongotube",
+    { useNewUrlParser: true }
+  );
+
+  mongoose.connection
+      .once('open', () => {
+        //console.log("Connected"):
+
+        done();
+      })
+      .on('error', () => console.log("Your Error", error));
+});
+
+/*
+  - done() is the method, whenever you want to call it, you can call it
+  and it's gonna pass on further information that "hey, my job was all done,
+  my test was all good"
+*/
+
+
+--------------------------------------------------------------------
+
+        4 - Describe and it blocks for mocha test
+        <test/mo_create_test.js>
+/* add my built-in schema */
+const Student = require('../app/student');
+
+const assert = require('assert');
+
+/* we need to describe block */
+describe('Create records', () => {
+  it('create a user in DB', () => {
+    /* we try to assume that Assertion is true */
+    assert(true);
+  });
+});
+
+/*
+  - { it } : it block is also like describe block or mini-describe block
+
+  - assertions are always assumed to go true.
+    + you have to write your test cases in such a manner, That is never fail
+*/
+
+/*
+    in package.json
+
+    change: {
+      "scripts": {
+      "test": "mocha"
+    },
+
+  TYPE: > npm run test
+  => run all file in <test folder>
+
+  Response:
+        Create records
+    ✓ create a user in DB
+
+
+  1 passing (33ms)  => See : it costs 33ms for interacting with data server
+
+*/
+
+--------------------------------------------------------------------
+
+        5 - Your first create test using mocha
+        <test/mo_create_test.js>
+/* add my built-in schema */
+const Student = require('../app/student');
+
+const assert = require('assert');
+
+/* we need to describe block */
+describe('Create records', () => {
+  it('create a user in DB', () => {
+    /* assert(true); */
+
+    const same = new Student({
+      name: "Sam"
+    });
+    /*  https://mongoosejs.com/docs/api.html#document_Document-$locals
+      save Sam info into database
+    */
+    same.save()
+        .then(() => {
+          assert(!same.isNew);
+          /*
+            b/c: we want to save() is successful
+            => assertion must be "false"
+          */
+        })
+        .catch(() => {
+          console.log("error");
+        })
+  });
+});
+
+
+/*
+  type: > npm run test
+
+  => And see on MongoDB Compass : mongotube database
+  + and time response: 1 passing (48ms)
+*/
+
+
+--------------------------------------------------------------------
+
+        6 - Using beforeEach in mocha test
+        <test/mo_create_test.js>
+
+const mongoose = require('mongoose');
+
+mongoose.Promise = global.Promise; // ES6- promise
+
+/*
+  - in this before , that means whatever happens, this is the helper file
+  which is gonna run for the very first
+
+  - before() here: each time, we run "npm run test"
+      to connect and save a document to my schema "student"
+    => each insert one new student document in database
+*/
+before((done) => {
+  mongoose.connect(
+    "mongodb://localhost/mongotube",
+    { useNewUrlParser: true }
+  );
+
+  mongoose.connection
+      .once('open', () => {
+        //console.log("Connected"):
+
+        done();
+      })
+      .on('error', () => console.log("Your Error", error));
+});
+
+beforeEach((done) => {
+  mongoose.connection.collections.students.drop(() => {
+    /* hey, drop() is success */
+    done();
+  });
+
+})
+
+/*
+  drop other student(trung lap) and keep one student
+  and each time we run "npm run test"
+  => this student document changes its _ID
+*/
+
+--------------------------------------------------------------------
+
+        7 - Read Test
+        <test/mo_create_test.js>
+
+/*
+    All read tests
+*/
+
+describe("Read Test", () => {
+  let reader;
+
+  // create an instance of document
+  beforeEach((done) => {
+    reader = new Student({name: "Reader"});
+    reader.save()
+        .then(() => {
+          done();
+        })
+  })
+
+  it("Read a user: Reader", (done) => {
+    Student.find({name: "Reader"})
+      .then(students => {
+        /*
+         _id is BSON value: ObjectId:
+         + we can compare _id in MongoDB, b/c it is ObjectId of BSON
+         + we can only convert it to String
+        */
+       console.log(students);
+       // [ { _id: 5d9705f2f3978d0761104677, name: 'Reader', __v: 0 } ]
+
+       // reader: Reader, itself
+        assert(reader._id.toString() === students[0]._id.toString());
+        /*  when assert() done => done()*/
+        done();
+      })
+  });
+});
+
+

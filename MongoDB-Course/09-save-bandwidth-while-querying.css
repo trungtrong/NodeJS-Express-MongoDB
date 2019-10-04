@@ -1,0 +1,69 @@
+          Project Fields to Return from Query
+https://docs.mongodb.com/manual/tutorial/project-fields-from-query-results/
+
+
+1 - Instead We get all information of users
+  > db.studentData.find({})
+   => it cost the bandwidth of Internet
+   => We need get all the necessary info of users
+
+1-1  <Solution>:
+    <using PROJECTION of find() to return all necessary info>
+
+      Ex: We only need <email info> of all users
+
+  >       db.studentData.find({}, {email: 1})
+    - filter: {}
+    - projection: {email: 1}
+      + 1 : true => to include that field in the return documents
+      + 0: otherwise
+
+    =>  Result:
+        { "_id" : ObjectId("5d95c49fe605814b816619e0"), "email" : "mai01@gmail.com" }
+        { "_id" : ObjectId("5d95c49fe605814b816619e1"), "email" : "tuan02@gmail.com" }
+        { "_id" : ObjectId("5d95c49fe605814b816619e2"), "email" : "lan@gmail.com" }
+        { "_id" : ObjectId("5d95c49fe605814b816619e3"), "email" : "tien@gmail.com" }
+
+            ---------------------------------
+
+1 - 2: <We need email and username, not id and courseCount> of all
+        users
+>       db.studentData.find({}, {email: 1, username: 1, _id: 0})
+
+  =>  Result:
+        { "email" : "mai01@gmail.com", "username" : "Mai" }
+        { "email" : "tuan02@gmail.com", "username" : "Tuan" }
+        { "email" : "lan@gmail.com", "username" : "Lan" }
+        { "email" : "tien@gmail.com", "username" : "Tien" }
+
+
+            ---------------------------------
+1 - 3 : To see Array of data
+>       db.studentData.find({}, {email: 1, username: 1, _id: 0}).toArray()
+
+  => Result:
+  [
+	  {
+		  "email" : "mai01@gmail.com",
+		  "username" : "Mai"
+	  },
+	  {
+		  "email" : "tuan02@gmail.com",
+		  "username" : "Tuan"
+	  },
+	  {
+		  "email" : "lan@gmail.com",
+		  "username" : "Lan"
+	  },
+	  {
+		  "email" : "tien@gmail.com",
+		  "username" : "Tien"
+	  }
+  ]
+            ---------------------------------
+
+1 - 4: We need <only courseCount of a specific User>
+
+>       db.studentData.find({email: "lan@gmail.com"}, {courseCount: 1, _id: 0})
+
+    =>  Result:     { "courseCount" : 2 }

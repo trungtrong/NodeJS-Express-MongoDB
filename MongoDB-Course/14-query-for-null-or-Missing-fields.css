@@ -1,0 +1,110 @@
+db.studentData.updateOne(
+  {
+    email: "tien@gmail.com"
+  },
+  {
+    $set: {
+      item: null
+    }
+  }
+)
+
+====> Add { item: null } to Tien
+
+  Response:
+> db.studentData.findOne( {email: "tien@gmail.com"})
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e3"),
+	"email" : "tien@gmail.com",
+	"courseCount" : 6,
+	"username" : "Tien",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	},
+	"lastLogin" : [
+		"Monday",
+		"Wednesday",
+		"Tuesday"
+	],
+	"score" : [
+		10,
+		34,
+		23
+	],
+	"item" : null
+}
+
+------------------------------------------------------------------------
+
+                14-1: Equality filter
+
+> db.studentData.find(
+    {
+      item: null
+    }
+  )
+
+  Response:
+  { "_id" : ObjectId("5d95c49fe605814b816619e0"), "email" : "mai01@gmail.com", "courseCount" : 4, "username" : "Mai", "profilePic" : { "width" : 100, "height" : 100, "defaultImg" : "img.png" }, "score" : [ 10, 34, 23 ] }
+  { "_id" : ObjectId("5d95c49fe605814b816619e1"), "email" : "tuan02@gmail.com", "courseCount" : 2, "username" : "Tuan", "profilePic" : { "width" : 100, "height" : 100, "defaultImg" : "img.png" } }
+  { "_id" : ObjectId("5d95c49fe605814b816619e2"), "email" : "lan@gmail.com", "courseCount" : 2, "username" : "Lan", "profilePic" : { "width" : 100, "height" : 100, "defaultImg" : "img.png" } }
+  { "_id" : ObjectId("5d95c49fe605814b816619e3"), "email" : "tien@gmail.com", "courseCount" : 6, "username" : "Tien", "profilePic" : { "width" : 100, "height" : 100, "defaultImg" : "img.png" }, "lastLogin" : [ "Monday", "Wednesday", "Tuesday" ], "score" : [ 10, 34, 23 ], "item" : null }
+  { "_id" : ObjectId("5d96bc8e02ddc31daa2051ea"), "email" : "tien@gmail.com" }
+
+=======> Print All Documents
+    b/c In JSON or BSON: when using Equality filter
+      { item: null }
+    => { item } field whose value is { null }
+        OR do not contain the ITEM field => ITEM does NOT EXIST
+
+------------------------------------------------------------------------
+
+          14-1: { $type } check of BSON
+
+--> { item: {$type: 10} }:
+    + query matches ONLY DOCUMENTs that contain the { item }
+      whose value is null
+    + and ITEM field does EXIST
+
+  NOTE: $type : BSON type
+    + 10: null of BSON type
+
+    https://docs.mongodb.com/manual/reference/operator/query/type/#document-type-available-types
+
+
+
+> db.studentData.find(
+    {
+      item: {
+        $type: 10
+      }
+    }
+  )
+
+  Response:
+  { "_id" : ObjectId("5d95c49fe605814b816619e3"),
+    "email" : "tien@gmail.com",
+    "courseCount" : 6,
+    "username" : "Tien",
+    "profilePic" :
+      { "width" : 100, "height" : 100, "defaultImg" : "img.png" },
+    "lastLogin" : [ "Monday", "Wednesday", "Tuesday" ],
+    "score" : [ 10, 34, 23 ],
+    "item" : null
+  }
+
+------------------------------------------------------------------------
+
+           14-1: { $exists } check
+==> The { item : { $exists: false } }
+    +  query matches documents that do not contain the item field
+
+> db.studentData.find(
+    {
+      item: {
+        $exists: false
+      }
+    }
+  )

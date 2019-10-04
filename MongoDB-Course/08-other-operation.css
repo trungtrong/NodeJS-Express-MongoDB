@@ -1,0 +1,130 @@
+1 - SORT() method
+    db.<name_collection>.find().sort().pretty()
+
+  1 - 1: Sort Ascending
+      db.studentData.find().sort({courseCount: 1}).pretty()
+
+  1 - 2: Sort Descending
+      db.studentData.find().sort({courseCount: -1}).pretty()
+
+            ---------------------------------
+
+2 - Count Rows: count the amount of Documents in Collection
+    db.<name_collection>.find().count()
+
+      Ex: db.studentData.find().count()
+
+            ---------------------------------
+
+3 - Limit Rows: print <number_of documents from begin>
+
+  db.<name_collection>.find().limit(<number>).pretty()
+
+  Ex: db.studentData.find().limit(2).pretty()
+  => {
+	      "_id" : ObjectId("5d95c49fe605814b816619e0"),
+	      "name" : "Mai",
+	      "email" : "mai01@gmail.com",
+	      "courseCount" : 4
+      }
+      {
+	      "_id" : ObjectId("5d95c49fe605814b816619e1"),
+	      "name" : "Tuan",
+	      "email" : "tuan02@gmail.com",
+	      "courseCount" : 2
+      }
+
+            ---------------------------------
+
+4 - Chaining
+    db.studentData.find().limit(2).sort({courseCount: 1}).pretty()
+
+            ---------------------------------
+
+5 - Foreach
+
+    db.studentData.find().forEach(function(student) {
+      print("Course Count: " + student.courseCount)
+    })
+  + student : represent <each document of student>
+
+            ---------------------------------
+
+6 - increment existing Field ($inc)
+
+  + Current:
+      {
+        name: "Lan",
+        email: "lan@gmail.com",
+        courseCount: 3,
+      }
+  + Apply increment:
+    > db.studentData.updateOne(
+        {email: "lan@gmail.com"},
+        {
+          $inc: {
+          courseCount: -1
+        }
+      })
+
+  + After:
+    {
+	    "_id" : ObjectId("5d95c49fe605814b816619e2"),
+	    "name" : "Lan",
+	    "email" : "lan@gmail.com",
+	    "courseCount" : 2
+    }
+
+            ---------------------------------
+
+7 - Rename a existing field
+
+  > db.studentData.updateMany(
+    {},
+    {
+      $rename: {
+        "name": "username"
+      }
+    }
+  )
+
+            ---------------------------------
+
+8 - Greater & Less Than: < $ operator is ony used in Filter argument >
+
+  8-1 : greater than
+db.studentData.find(
+  {
+    courseCount: {
+      $gt: 2  // greater than 2
+    }
+  })
+
+  8-2 : greater than and equal
+db.studentData.find(
+  {
+    courseCount: {
+      $gte: 2  // greater than 2
+    }
+  })
+
+  8-3 : less than
+db.studentData.find(
+  {
+    courseCount: {
+      $le: 2  // greater than 2
+    }
+  })
+
+  8-4 : less than and equal
+db.studentData.find(
+  {
+    courseCount: {
+      $lte: 2  // greater than 2
+    }
+  })
+
+            ---------------------------------
+
+9 - Search for a single world
+https://docs.mongodb.com/manual/reference/operator/query/

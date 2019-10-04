@@ -1,0 +1,176 @@
+<Update an Array value of the key for Document>
+      and find() or Query Array or Array of Embedded Documents
+
+10 - 1: <Update an Array value of the key for Document>
+
+>   db.studentData.updateOne(
+      {
+        "email": "tien@gmail.com"
+      },
+      {
+        $set: {
+          lastLogin: ["Monday", "Wednesday", "Tuesday"]
+        }
+      }
+    )
+
+
+                    10 - 2 - QUERY Array
+
+https://docs.mongodb.com/manual/tutorial/query-arrays/
+=> Mongo Shell
+
+    10-2-1 - exact 100%: includes entire data in Array
+
+> db.studentData.find(
+      {
+        lastLogin: ["Monday", "Wednesday", "Tuesday"]
+      }
+    )
+
+    10-2-2 - { $all } operator for ARRAY
+
+  => Syntax: $all: []
+
+  => selects the Documents that contain all the value of { $all }
+      + that means: without regard to order or other element in Array
+
+>   db.studentData.find(
+      {
+        lastLogin: {
+          $all: ["Monday"]
+        }
+      }
+    )
+=> Documents that contains lastLogin: includes "Monday"
+
+  or
+    db.studentData.find(
+      {
+        lastLogin: {
+          $all: ["Monday", "Wednesday", "Tuesday"]
+        }
+      }
+    )
+=> Documents that contains lastLogin: includes "Monday", "Wednesday"
+        and "Tuesday"
+
+10-2-4 - < Query an Array with Compound Filter Conditions on the
+          Array Elements>
+  => using { $gt , $lt ,... }
+
+    Step1 - update with score: [10, 34, 23]
+
+  > db.studentData.updateOne(
+      {email: "tien@gmail.com"},
+      {
+        $set: {
+          score: [10, 34, 23]
+        }
+      }
+    )
+ => Result:
+    { "_id" : ObjectId("5d95c49fe605814b816619e3"),
+      "email" : "tien@gmail.com",
+      "courseCount" : 6,
+      "username" : "Tien",
+      "profilePic" : { "width" : 100, "height" : 100, "defaultImg" : "img.png" },
+      "lastLogin" : [ "Monday", "Wednesday", "Tuesday" ],
+      "score" : [ 10, 34, 23 ]
+    }
+
+    Step2 - Find with Filter
+
+  > db.studentData.find(
+      {
+        score: { $gt: 5, $lt: 20}
+      }
+    )
+
+                 ------------------------------------
+      10-2-3 - { $elemMatch } operator for ARRAY
+
+  => Syntax: $elemMatch: {}
+    => selects Documents that meet AT LEAST the Requirements
+        of $elemMatch
+
+    > db.studentData.find({
+          score: {
+            $elemMatch: {
+              $gt: 20
+            }
+          }
+      })
+  => find documents that contains value of score[] > 20
+    ------------------------------------
+
+        10-3: Array of Embedded Documents
+https://docs.mongodb.com/manual/tutorial/query-array-of-documents/
+
+NOTE: insert new documents
+    > db.studentData.insertMany([
+      { item: "journal", instock: [ { warehouse: "A", qty: 5 }, { warehouse: "C", qty: 15 } ] },
+      { item: "notebook", instock: [ { warehouse: "C", qty: 5 } ] },
+      { item: "paper", instock: [ { warehouse: "A", qty: 60 }, { warehouse: "B", qty: 15 } ] },
+      { item: "planner", instock: [ { warehouse: "A", qty: 40 }, { warehouse: "B", qty: 5 } ] }
+    ])
+
+  10-3-1: QUERY for Document Nested in an Array
+
+> db.studentData.find(
+  {
+    instock: {
+      warehouse: "A", qty: 5
+    }
+  })
+
+=> <name_Array>: {sub-document of this name_Array}
+
+  10-3-2: Specify a Query Condition on the Field in an Array
+          of Documents
+
+> db.studentData.find(
+  {
+    "instock.qty": {
+      $lte: 20
+    }
+  })
+
+  10-3-3- use the Array Index to Query for a Field
+        in the Embedded Document
+====> using { dot notation }
+
+> db.studentData.find(
+  {
+    "instock.0.qty": {
+      $lte: 20
+    }
+  })
+
+  ===> "instock.0.qty": element[0] of instock array
+
+  10-3-4: A single Nested Document Meets Multiple Query Conditions
+          on NESTED fields
+
+> db.studentData.find(
+  {
+    "instock": {
+      $elemMatch: {
+        qty: 5, warehouse: "A"
+      }
+    }
+  })
+
+  Ex2:
+
+> db.studentData.find(
+  {
+    "instock": {
+      $elemMatch: {
+        qty: {
+          $gt: 10, $lte: 20
+        }
+      }
+    }
+  }
+)

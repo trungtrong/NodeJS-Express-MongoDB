@@ -1,0 +1,150 @@
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e0"),
+	"email" : "mai01@gmail.com",
+	"courseCount" : 4,
+	"username" : "Mai",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	},
+	"score" : [
+		10,
+		34,
+		23
+	]
+}
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e1"),
+	"email" : "tuan02@gmail.com",
+	"courseCount" : 2,
+	"username" : "Tuan",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	}
+}
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e2"),
+	"email" : "lan@gmail.com",
+	"courseCount" : 2,
+	"username" : "Lan",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	}
+}
+{
+	"_id" : ObjectId("5d95c49fe605814b816619e3"),
+	"email" : "tien@gmail.com",
+	"courseCount" : 6,
+	"username" : "Tien",
+	"profilePic" : {
+		"width" : 100,
+		"height" : 100,
+		"defaultImg" : "img.png"
+	},
+	"lastLogin" : [
+		"Monday",
+		"Wednesday",
+		"Tuesday"
+	],
+	"score" : [
+		10,
+		34,
+		23
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e6"),
+	"item" : "journal",
+	"instock" : [
+		{
+			"warehouse" : "A",
+			"qty" : 5
+		},
+		{
+			"warehouse" : "C",
+			"qty" : 15
+		}
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e7"),
+	"item" : "notebook",
+	"instock" : [
+		{
+			"warehouse" : "C",
+			"qty" : 5
+		}
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e8"),
+	"item" : "paper",
+	"instock" : [
+		{
+			"warehouse" : "A",
+			"qty" : 60
+		},
+		{
+			"warehouse" : "B",
+			"qty" : 15
+		}
+	]
+}
+{
+	"_id" : ObjectId("5d96b01e02ddc31daa2051e9"),
+	"item" : "planner",
+	"instock" : [
+		{
+			"warehouse" : "A",
+			"qty" : 40
+		},
+		{
+			"warehouse" : "B",
+			"qty" : 5
+		}
+	]
+}
+
+            ------------------------------------
+
+          13.1. Match an Embedded/ Nested Document
+
+> db.studentData.find(
+    {
+      profilePic : {
+        width : 100,
+        height : 100,
+        defaultImg : "img.png"
+      }
+    }
+  )
+
+            ------------------------------------
+
+          13.2. Specify Equality Match ona Nested Field
+
+> db.studentData.find(
+    {
+      "profilePic.width": 100
+    }
+  )
+
+            ------------------------------------
+
+          13.3. Specify AND Condition
+
+  Ex:
+> db.studentData.find(
+  {
+    "profilePic.width": 100,
+    "profilePic.height": {
+      $lte: 100
+    },
+    "profilePic.defaultImg" : "img.png"
+  }
+)

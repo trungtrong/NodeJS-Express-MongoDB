@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Bai 04 Serving HTML Pages</title>
+      <link rel="stylesheet" type="text/css" href="../assets/styles.css">
+    </head>
+    <body>
+      <h1>Welcome to Profile <%= person %></h1>
+      <p>Age: <%= data.age %></p>
+      <p>Job: <%= data.job %></p>
+
+      <h2>Hobbies</h2>
+      <ul>
+        <% data.hobbies.forEach(function(item) { %>
+          <li><%= item %></li>
+        <% }); %>
+      </ul>
+
+    </body>
+</html>

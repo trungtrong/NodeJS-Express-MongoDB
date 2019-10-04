@@ -1,0 +1,23 @@
+  https://docs.mongodb.com/manual/tutorial/query-embedded-documents/
+
+1 - Add the sub-object <profilePicture of a user>
+
+ >  db.studentData.updateMany(
+      {},
+      {
+        $set: {
+          profilePic: {
+            width: 100,
+            height: 100,
+            defaultImg: "img.png"
+          }
+        }
+      }
+    )
+
+2 - Find the user following the sub-object info of User
+  >  db.studentData.find({
+        "profilePic.width": 100
+      })
+
+  + need "" : double mark for profilePic.width

@@ -1,0 +1,15 @@
+1 - DELETE FIRST one that must MATCHES Info
+  db.<name_collection>.deleteOne(filter, options)
+
+  Ex: db.studentData.deleteOne({email: "mai01@gmail.com"})
+
+  > Response:
+          { "acknowledged" : true, "deletedCount" : 1 }
+
+2 - DELETE ALL that must MATCHES Info
+  db.<name_collection>.deleteMany(filter, options)
+
+  Ex: db.studentData.deleteMany({})  => delete all
+
+  > Response:
+      { "acknowledged" : true, "deletedCount" : 2 }
