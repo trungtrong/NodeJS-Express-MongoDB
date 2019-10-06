@@ -1,10 +1,10 @@
 {
-  "name": "08-express",
+  "name": "09-auth-with-cookie-and-middleware",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "cookie-parser": "^1.4.4",
     "ejs": "^2.7.1",
     "express": "^4.17.1",
+    "mongoose": "^5.7.3",
     "nodemon": "^1.19.3"
   }
 }

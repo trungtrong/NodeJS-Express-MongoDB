@@ -1,8 +1,11 @@
-<pre>
-- Node JS is platform built-on the Chrome's Javascript runtime
 
-- Node JS uses Google Chrome's execution engine v8    written in C++ and asynchronous processing to do this
-+ V8 compiles JavaScript code into machine code for computer
+- Node JS is platform built-on the Chrome's Javascript runtime
+  for Server-side
+  + and a single threaded
+- Node JS uses Google Chrome's execution engine v8 
+  written in C++ and asynchronous processing to do this
+
+  + uses Google JavaScript v8 Engine to execute code
 
 - Great for building Real Time applications
 
@@ -109,9 +112,15 @@
 
 ----------------------------
   <NOTE> as we can see: In index.ejs / contact.ejs /profile.ejs
-  => <We-use> the <external-CSS> from <assets-file>
+  =>  Although we have the <external-CSS> from <assets-file>
   	<link rel="stylesheet" type="text/css" href="assets/styles.css" />
-  But it <does-NOT-work>
+  => But it doesn't work
+    - B/c When server render: 
+      + Server only Response content of <body> and <head>
+      + but <href="assets/styles.css"> doesn't exist
+        - b/c it is also a URL : localhost:3000/assets/styles.css
+        - but we don't render this path:   app.get('/assets/styles.css') 
+
 
   <Solution-for-this> using <Serving-STATIC-Files>
   but if we use the route "assets/images or external styles or JS , ect"
@@ -159,6 +168,7 @@
       + If match <GET> method match <app.get-func>
          => app.get executes
 
+      + Functionality: xử lý dữ liệu trước khi response
                   -----------------------------------------
 
         <FIRST-> Middleware functions can perform the <following-TASKS>:
@@ -209,10 +219,13 @@
 
   6 - Authenticating/ authorizing requests
 
-            <SECOND-----------------> NOTE: all the problems
+            <SECOND-----------> NOTE: all the problems
 
 1 - if we don't use next() method =>
   =>  Response Status <pending>
+  => That page will reload forever, tới 1 thời gian
+    when time out sẽ ngừng load và báo lỗi về cho 
+    trình duyệt
   =>  app.get() don't response data
 
 2 - Middleware func is called, when we use <app.use-function>
@@ -264,15 +277,54 @@
     +  call the next() method
     +
 
-
-
-
-
-
 REFERENCE:
   - console.log('Request URL:', req.originalUrl);
     + to see current path
 
   - console.log('Request Type:', req.method);
     + to see GET
-</pre>
+
+--------------------------------------------------------------------
+              Lesson 6: ROUTER 
+        <5-5-apply Router in NODE>
+  /*
+  Instead place all Tasks about routing in a ONE file 
+  + We use ROUTER to split code minimum
+  1 - the main file: we use app.express()
+
+  2 - The sub-Router: we use router.express() for sub-routing
+Application:
+  + With User route: include /user/create ,...
+  => we use ROUTER to contain all its sub-route
+*/
+
+--------------------------------------------------------------------
+              Lesson 7: Controller in MVC
+    In 08-controller-in-MVC
+app.set('view engine', 'ejs');
+
+// Virtual path prefix
+app.use('/assets', express.static('assets'));
+
+app.get('/', controller.home);
+
+app.get('/contact', controller.getContact);
+
+// Use ROUTER with /profile root ROUTE
+app.use('/profile', router);
+
+app.listen(3000);
+
+          ----------------------
+      In profile.controller.js
+  
+module.exports.home = function(req, res) {
+  res.render('index');
+};
+
+module.export.getContact = function(req, res) {
+  res.render('contact');
+};
+
+
+
