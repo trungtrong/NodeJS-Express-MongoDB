@@ -1,0 +1,708 @@
+                      STEP 1:
+        start-nodejs Apps using-express
+  1- npm install express morgan body-parser mongodb mongoose
+
+  2 -  app.js
+  // require express module
+const express = require('express');
+const app = express();
+
+/* Morgan: HTTP request logger middleware for node.js
+  to see friendly notifications in the terminal
+  such as GET 'signup'
+    https://www.npmjs.com/package/morgan
+    
+    https://alligator.io/nodejs/getting-started-morgan/
+
+Explanation:
+  - Morgan: is another HTTP request logger middleware for 
+  Node.js. It simplifies the process of logging requests
+  to your application. You might think of Morgan as a 
+  helper that collects logs from your server, such as 
+  your request logs. It saves developers time because 
+  they don’t have to manually create common logs. 
+  It standardizes and automatically creates request logs.
+
+  - Morgan can operate standalone, but commonly it’s 
+  used in combination with Winston. Winston is able to
+  transport logs to an external location, or query them
+  when analyzing a problem.
+
+    Search: 
+      + How to use Morgan logger?
+      + Morgan ? logger ?
+*/
+const morgan = require('morgan');
+
+/*  -     Node.js body parsing middleware 
+  + to extract body info from HTTP headers
+  - parse req.body to JSON/BUFFER/ etc
+    + if the { Content-Type } request header matches
+      the { type } options
+    => req.body will parse to JSON
+      + b/c req.body is received from Client
+        is an Object
+
+    + Otherwise, return empty object {}
+ 
+*/
+const bodyParser = require('body-parser');
+/*
+  - CORS is a node.js package for providing 
+  a Connect/Express middleware that can be used to 
+  enable CORS with various options.
+  - NOTE: read the configure on npm
+  https://www.npmjs.com/package/cors
+*/
+const cors = require('cors');
+
+/* middlewares
+  - use 'dev' format in console logs in terminal
+*/
+app.use(morgan('dev')); 
+
+/*
+  - parse req.body with Headers { application/x-www-form-urlencoded }
+  - in here, don't necessary
+*/
+app.use(bodyParser.urlencoded({ extended: false }));
+/*
+  - default type of bodyParse.json is { application/json } 
+*/
+app.use(bodyParser.json()); // parse json
+
+/*
+  - enable all CORS request
+*/
+app.use(cors());
+
+/* 
+  - start the server on the given port
+  - process.env.PORT: domain such as github.io 
+*/ 
+const port = process.env.PORT || 3000;
+app.listen(port);
+
+console.log(`Server is listening on ${port}`);
+
+z-----------------------------------------------------------------
+                    STEP 2: build-api
+/*
+  - Instead of writing all the code inside app.js, 
+  we will be adopting MVC (model, view, controller) pattern.
+  But obviously there will be no views folder because
+  we are building API. Lets begin by creating   
+  two folders inside the nodeapi project folder.
+*/
+z---------- controllers/user.controller.js
+/*
+  - First: Create a list of Middleware function
+    to response data to Client
+*/
+  module.exports = {
+  // req - contains incoming http request information
+  // res - has methods available to respond to the incoming requests
+  // next - proceed to the next stage
+  
+  signup: async (eq, res, next) => {
+    res.json('sign up called');
+  },
+
+  signin: async (req, res, next) => {
+    res. json('signin called');
+  },
+  secret: async (req, res, next) => {
+    res.json('secret called');
+  }
+}
+z---------- routes/user.route.js
+const express = require('express');
+
+const router = express.Router();
+
+const UsersController = require('../controllers/user.controller');
+
+/* 
+  - for validation - use object destructuring to bring
+  in only the needed properties
+*/
+
+router.post('/users/register', UsersController.signup);
+
+router.post('/users/login', UsersController.signin );
+
+// secret page will only occur for authenticated User
+router.get('/user', UsersController.secret)
+
+module.exports = router;
+
+z---------- now-lets use-the-routes in app.js
+const UsersRoute = require('./routes/user.route');
+
+app.use(bodyParser.json()); // parse json
+/* use routes: signup, signin, secret */
+
+app.use('/api', UsersRoute);
+
+z-----------------------------------------------------------------
+                      step-3:
+                validation-using Joi
+
+/*
+  - Before saving user data(on user signup) to database, 
+  we obviously need to validate the data. We can use a 
+  package called Joi for validation 
+  which a part of a Hapi JS, a node js framework.
+*/
+
+z--------- install-joi
+      npm install joi
+
+z--------- create- routeHelpers .js
+const Joi = require('joi');
+
+/*
+  - We use this below validation inside routes/users.js
+*/
+
+module.exports = {
+  validateBody: (schema) => {
+    return (req, res, next) => {
+      /*
+       -  validate the incoming req.body using Joi.Validate()
+       passing arguments - req.body and schema 
+      */
+      const result = Joi.validate(req.body, schema);
+      console.log(req.body);
+      
+      /* on error */
+      if (result.error) {
+        /*
+          respond with 400 status code and error in 
+            json format
+        */
+        console.log(result.error);
+        return res.status(400).json(result.error);
+      }
+
+      /*
+        - attach value property to { res } object
+        - our goal is to use validated data
+        ( res.value.body ) instead of direct (res.body)
+      */
+      if (!req.value) {
+        req.value = {};
+      }
+
+      req.value["body"] = result.value;
+      next();
+    }
+  },
+    /* define schemas object */
+    schemas : {
+      authSchema: Joi.object().keys({
+        email: Joi.string()
+            .email()
+            .required(),
+        password: Joi.string().required(),
+        username: Joi.string()
+      })
+    }
+};
+
+z--------- Now we can use this validation inside routes/users.js
+
+const express = require('express');
+
+const router = express.Router();
+
+const UsersController = require('../controllers/user.controller');
+
+/* 
+  - for validation - use object destructuring to bring
+  in only the needed properties
+*/
+const { validateBody, schemas } = require('../helpers/routeHelpers');
+
+router.post('/users/register', validateBody(schemas.authSchema), UsersController.signup);
+
+router.post(
+  '/users/login',
+  validateBody(schemas.authSchema),
+  UsersController.signin
+);
+
+/*
+- secret page will only occur for authenticated User
+*/
+router.get('/user', 
+  UsersController.secret
+)
+
+module.exports = router;
+
+z-----------------------------------------------------------------
+                      step-4:
+              using mongodb-to-save user
+
+z----- Connect Nodejs with mongodb:  app.js
+// require mongoose and connect to MongoDB
+const mongoose = require('mongoose');
+
+/*
+  - nodeapi will be the name of the database
+  + if it doesn't exist , will be created automatically
+  + if you are using { mLab } , pass the url
+*/
+
+mongoose.connect(
+  'mongodb+srv://trong:' + 'tr01664136504' +'@test-authentication-uefnp.mongodb.net/trong?retryWrites=true&w=majority',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+  }
+).catch(error => console.log(error));
+
+z-------- Create models/user.model.js
+
+/*
+  - Models will act like a middleman for communicating
+   with database.
+*/
+
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+/*- create a Schema
+  - pass an object for each { field } in document of Collection
+   + and define these type of each field
+*/
+const UserSchema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  username: {
+    type: String
+  }
+
+});
+
+/*
+  - create a model - make the model name singular
+  - and mongoose will make it plural as Database name
+*/
+const User = mongoose.model('user', UserSchema);
+
+/* export the model */
+module.exports = User;
+
+z--------  controllers/user.controller.js
+/*
+- In controllers/user.js first require the user from 
+  models/user so that we can create a new user. 
+  Mongoose will be in instant communication with given 
+  database
+*/
+
+/* require user model */
+const User = require('../models/user.model');
+
+module.exports = {
+  /* req - contains incoming http request information
+  */
+  signup: async (req, res, next) => {
+    /*
+      - use { req.value.body } not { req.body }
+      + this will give use validated body of the parent
+    */
+    const { email, password, username } = await req.value.body;
+
+    /*
+      1 - check if user exists
+      - use await keyword b/c it takes time
+        to solve this this query fom database
+    */
+    const foundUser = await User.findOne({ email });
+
+    if (foundUser) {
+      /* respond with 403 forbidden status code */
+      return res.status(403).json({
+        error: "Email already is use"
+      })
+    }
+    /*
+      2 - Create a new object for a new user that log in
+      for the first time
+    */
+    const newUser = new User({
+      email,
+      password,
+      username
+    });
+
+    await newUser.save();
+    
+    console.log('user is saved');
+
+    res.json({
+			user: "created"
+		});
+  },
+
+}
+
+z-----------------------------------------------------------------
+                      step-5:
+              JWT - json-web-token
+  /*
+    - Lets generate json web token and respond with 
+    token on user signup. First we need to install 
+    npm package jsonwebtoken
+  */
+
+z------ npm install jsonwebtoken
+
+z------ controllers/user.controller.js
+/* require json web token
+ https://github.com/auth0/node-jsonwebtoken
+*/
+const JWT = require("jsonwebtoken");
+const { JWT_SECRET } = require('../config/index');
+
+
+
+/* 
+  -create a signToken method to generate a token,
+  - passing user as argument
+*/
+signToken = user => {
+  return JWT.sign(
+    {
+      iss: "NodeAPI", // issuer
+      sub: user.id, // sub means subject which is mandatory
+      iat: new Date().getTime() // issued at date
+    },
+    JWT_SECRET // random secret
+  );
+};
+
+
+module.exports = {
+  // req - contains incoming http request information
+
+  signup: async (req, res, next) => {
+    /*
+      - use { req.value.body } not { req.body }
+      + this will give use validated body of the parent
+    */
+    const { email, password, username } = await req.value.body;
+
+    /*
+      1 - check if user exists
+      - use await keyword b/c it takes time
+        to solve this this query fom database
+    */
+    const foundUser = await User.findOne({ email });
+
+    if (foundUser) {
+      // respond with 403 forbidden status code
+      return res.status(403).json({
+        error: "Email already is use"
+      })
+    }
+    /*
+      2 - Create a new object for a new user that log in
+      for the first time
+    */
+    const newUser = new User({
+      email,
+      password,
+      username
+    });
+
+
+    await newUser.save();
+    console.log('user is saved');
+
+    /* use signToken method to generate token
+     and respond on signup */
+    const token = await signToken(newUser);
+    
+    res.status(200).json({ token });
+  },
+
+  signin: async (req, res, next) => {
+    /* 
+    - Similar to signup method, we need to send token 
+      as response so that the user can be authenticated.
+    
+    -  respond with token: when user login => provide token to client
+    */
+    const token = await signToken(req.user);
+    res.status(200).json({ token });
+  },
+  secret: async (req, res, next) => {
+    const token = await signToken(req.user);    
+    res.status(200).json({ token });
+  }
+}
+
+z------ config/index.js
+/*
+  - Lets extract the random string "jkahfdskjhfalkdslads" 
+  to a new location
+
+  -
+*/
+module.exports = {
+  JWT_SECRET: "jkahfdskjhfalkdslads",
+  connectionString: 'mongodb+srv://trong:' + 'tr01664136504' +'@test-authentication-uefnp.mongodb.net/trong?retryWrites=true&w=majority'
+};
+
+
+z-----------------------------------------------------------------
+                      step-6:
+            passport-authentication strategy
+      using JSON web tokens
+  ===> to authenticate if User have Token or not
+  => Then respond with JWT which can be used 
+      to authorize user to protected routes
+/*
+  - we have been able to create a new user and respond
+  with token. Now based on this token a user must be 
+  authenticated. A user with token should have access 
+  to "/user" route. 
+  - Any other user who has not signup or signin into 
+  our application should not get access to "/user" 
+  route
+*/
+
+z-------- npm install passport passport-jwt
+
+z-------- Then create a file called passport.js 
+              in the root of your project.
+    Passport Authentication strategy using JSON web tokens
+
+const passport = require('passport');
+
+/* https://www.npmjs.com/package/passport-jwt
+*/
+const JwtStategy = require('passport-jwt').Strategy;
+const { ExtractJwt } = require('passport-jwt');
+
+const { JWT_SECRET } = require('./config/index');
+const User = require('./models/user.model');
+
+const jwtStrategyOptions = { 
+  /* 
+    - in my case in Angular: token is added into Header
+    => should use ExtractJwt.fromAuthHeaderAsBearerToken();
+
+    - use ExtractJwt to extract(trich xuat) token from the request
+    + Function that accepts a request as the only 
+      parameter and returns either the JWT as a string or null
+  */
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken("authorization"),
+  secretOrKey: JWT_SECRET
+}
+
+passport.use(
+  new JwtStategy(
+    jwtStrategyOptions,
+    /*
+    - payload is an object literal containing the decoded JWT payload
+    - payload represents whatever is in const token = JWT.sign(...)
+    -  payload.sub means JWT.sign({sub: newUser.id})
+    */
+    async (payload, done) => {
+      try {
+        /* find the user specified in token */
+        const user = await User.findById(payload.sub);
+
+        /* if user doesn't exist, handle it */
+        if (!user) {
+          return done(null, false);
+        }
+
+        /* otherwise return the user */
+        done(null, user);
+      } catch(error) {
+        done(error, false);
+      }
+      
+    }
+  )
+)
+
+z-------- Then use passport in routes/user.route.js
+
+const passport = require('passport');
+const passportConf = require('../passport');
+
+/*
+  secret page will only occur for authenticated User
+*/
+router.get('/user', 
+  passport.authenticate('jwt', {session: false}),
+  UsersController.secret
+)
+
+z-----------------------------------------------------------------
+                      step-7:
+            passport-local strategy
+  to authenticate using username and password
+
+  https://github.com/jaredhanson/passport-local
+
+
+z-------npm install passport-local
+
+z------- passport.js
+
+const LocalStrategy = require('passport-local').Strategy;
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: 'email'
+    },
+    async (email, password, done) => {
+      try {
+        console.log("passport local strategy");
+        
+        /* 
+          find the user specified in the given email
+        */
+        const user = await User.findOne({email});
+
+        /*
+          if use doesn't exist, handle it
+        */
+        if (!user) {
+          return done(null, false);
+        } 
+
+      } catch (error) {
+        done(error, false);  
+      }
+    }
+  )
+)
+
+z------- use: passport-local input user.route.js
+
+router.post(
+  '/users/login',
+  validateBody(schemas.authSchema),
+  passport.authenticate('local', {session: false}),
+  UsersController.signin
+);
+
+
+
+z-----------------------------------------------------------------
+                      step-8:
+          Password hashing and compare using { bcrypt }
+
+  => encrypt and hash password
+/* check if password is correct
+  For Security, Password must be encrypt
+  not a raw text
+  => if no, other developer can read Password
+  of user and scam user
+  - Solution:using bcrypt before saving to database 
+  which is a standard practice
+        */
+
+z------- npm install bcryptjs
+
+z------- step-1 in user.controller.js
+Before saving to database, we must hash password
+
+signup: async (req, res, next) => {
+
+  const { email, password, username } = await req.value.body;
+
+  const foundUser = await User.findOne({ email });
+
+  if (foundUser) {
+    // respond with 403 forbidden status code
+    return res.status(403).json({
+      error: "Email already is use"
+    })
+  }
+
+  const newUser = new User({
+    email,
+    password,
+    username
+  });
+
+  /*
+  - and await for a new user to be saved b/c it takes 
+    some time
+  - hash password before saving to database
+  */
+  const salt = await bcrypt.genSalt(10);
+
+  /*  generate a password hash (salt + hash) */
+  const passwordHash = await bcrypt.hash(newUser.password, salt);
+  
+  /* save password is hashed to database */
+  newUser.password = passwordHash;
+
+  /* 
+    after hashing password => add password is 
+    hashed to database
+  */
+  await newUser.save();
+
+  const token = await signToken(newUser);
+  
+  res.status(200).json({ token });
+}
+
+z------- step-2 in passport.js
+
+- using passport-local to check if password matches or not
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: 'email'
+    },
+    async (email, password, done) => {
+      try {
+        const user = await User.findOne({email});
+        
+        if (!user) {
+          return done(null, false);
+        } 
+
+        const isMatch = await bcrypt.compareSync(password, user.password);
+
+        if (!isMatch) {
+          return done(null, false);
+        }
+
+        done(null, user);
+      } catch (error) {
+        done(error, false);  
+      }
+    }
+  )
+)
+
+
+
+
+

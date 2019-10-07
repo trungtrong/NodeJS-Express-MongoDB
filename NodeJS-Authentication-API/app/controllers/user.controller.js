@@ -33,7 +33,7 @@ module.exports = {
       - use { req.value.body } not { req.body }
       + this will give use validated body of the parent
     */
-    const { email, password, username } = await (req.value.body);
+    const { email, password, username } = await req.value.body;
 
     /*
       1 - check if user exists

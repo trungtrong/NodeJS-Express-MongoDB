@@ -19,25 +19,27 @@ const bcrypt = require('bcryptjs');
 */
 const LocalStrategy = require('passport-local').Strategy;
 
+const jwtStrategyOptions = { 
+  /* 
+    - in my case in Angular: token is added into Header
+    => should use ExtractJwt.fromAuthHeaderAsBearerToken();
+
+    - use ExtractJwt to extract(trich xuat) token from the request
+    + Function that accepts a request as the only 
+      parameter and returns either the JWT as a string or null
+  */
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken("authorization"),
+  secretOrKey: JWT_SECRET
+}
+
 passport.use(
   new JwtStategy(
-    { 
-      /* 
-        - in my case in Angular: token is added into Header
-        => should use ExtractJwt.fromAuthHeaderAsBearerToken();
+    jwtStrategyOptions,
 
-        - use ExtractJwt to extract(trich xuat) token from the request
-
-        - jwtFromRequest (REQUIRED) 
-        + Function that accepts a request as the only 
-          parameter and returns either the JWT as a string or null
-      */
-      jwtFromRequest: ExtractJwt.fromHeader("authorization"),
-      secretOrKey: JWT_SECRET
-    },
-
+    // payload is an object literal containing the decoded JWT payload
+    
     // payload represents whatever is in const token = JWT.sign(...)
-    // payload.sub means JWT.sign({sub: newUser.id})
+    // payload.sub means JWT.sign({sub: newUser.id}) 
     async (payload, done) => {
       try {
         // find the user specified in token

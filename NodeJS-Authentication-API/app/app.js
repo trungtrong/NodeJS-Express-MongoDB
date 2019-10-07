@@ -8,10 +8,10 @@ const app = express();
     https://www.npmjs.com/package/morgan
 */
 const morgan = require('morgan');
-// to extract body info form HTTP headers
+// to extract body info frm HTTP headers
 const bodyParser = require('body-parser');
 
-const UsersRoute = require('./routes/users.route');
+const UsersRoute = require('./routes/user.route');
 
 const cors = require('cors');
 
@@ -24,7 +24,7 @@ const mongoose = require('mongoose');
   + if you are using { mLab } , pass the url
 */
 
-// const password = process.env.
+
 mongoose.connect(
   'mongodb+srv://trong:' + 'tr01664136504' +'@test-authentication-uefnp.mongodb.net/trong?retryWrites=true&w=majority',
   {
@@ -32,8 +32,7 @@ mongoose.connect(
     useUnifiedTopology: true,
     useCreateIndex: true
   }
-)
-  .catch(error => console.log(error));
+).catch(error => console.log(error));
 
 
 // middlewares
@@ -57,6 +56,7 @@ app.use('/api', UsersRoute);
 
 
 // start the server on the given port
+// process.env.PORT: domain such as github.io 
 const port = process.env.PORT || 3000;
 app.listen(port);
 

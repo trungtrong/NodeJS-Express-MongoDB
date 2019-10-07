@@ -39,3 +39,7 @@ Basically, substitute /admin in the connection string to the name of your cluste
         username: Joi.string() /////// adding username
       })
     }
+
+------------------------------------------------
+5- Response: "unauthorized"
+But if you remove the token and try accessing the secret page, you get unauthorized. 
