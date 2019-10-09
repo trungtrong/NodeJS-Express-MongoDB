@@ -42,4 +42,21 @@ Basically, substitute /admin in the connection string to the name of your cluste
 
 ------------------------------------------------
 5- Response: "unauthorized"
-But if you remove the token and try accessing the secret page, you get unauthorized. 
+======> Solution: But if you remove the token and try accessing the secret page, you get unauthorized. \
+
+------------------------------------------------
+6 - POST /api/users/register 400 1916.892 ms - 1106
+SyntaxError: Unexpected token e in JSON at position 3
+
+======> Solution: JSON that we use to send by Postman
+  must be "email": "trongngo"
+
+------------------------------------------------
+7-  SyntaxError: Unexpected string in JSON at position 33
+
+{
+	"email": "trong05@gmail.com",    <-- must have comma
+	"password": "tr123456789"   <== dont have comma
+}
+
+// Reference: https://filosophy.org/code/fixing-syntaxerror-unexpected-string-token-in-json-at-position/

@@ -294,6 +294,12 @@ const UserSchema = new Schema({
     type: String
   }
 
+},{
+  /*
+    -If set timestamps, mongoose assigns createdAt 
+    and updatedAt fields to your schema
+  */
+  timestamps: true
 });
 
 /*
@@ -388,7 +394,7 @@ signToken = user => {
   return JWT.sign(
     {
       iss: "NodeAPI", // issuer
-      sub: user.id, // sub means subject which is mandatory
+      sub: user.id, // sub means subject which is mandatory  = _id of user
       iat: new Date().getTime() // issued at date
     },
     JWT_SECRET // random secret
@@ -448,10 +454,40 @@ module.exports = {
     -  respond with token: when user login => provide token to client
     */
     const token = await signToken(req.user);
+    /*
+    console.log(req.user);
+    req.user =  { _id: 5d9a1a10c112461dfc457a9f,
+      email: 'trong02@gmail.com',
+      password:
+       '$2a$10$t16Q.77xFoRyxd2WnroN8ePQqyrwMfIYU4aLMFLfRdAeQ1oK15eIu',
+      username: 'trongngo',
+      __v: 0,
+      updatedAt: 2019-10-08T14:30:58.397Z }
+
+    =======> B/c: we apply passport.authenticate('jwt', {session: false}) 
+      in user.route.js
+      => Passport uses Token with attached ID (sub)
+      and then it returns the user's Info 
+    */
+
+
     res.status(200).json({ token });
   },
   secret: async (req, res, next) => {
-    const token = await signToken(req.user);    
+    const token = await signToken(req.user);  
+
+    /*
+    - console.log('req.user ', req.user);
+      req.user=  { _id: 5d9a1a10c112461dfc457a9f,
+        email: 'trong02@gmail.com',
+        password:
+        '$2a$10$t16Q.77xFoRyxd2WnroN8ePQqyrwMfIYU4aLMFLfRdAeQ1oK15eIu',
+        username: 'trongngo',
+        __v: 0,
+        updatedAt: 2019-10-08T14:45:58.983Z }
+    - b/c Passport middleware return user's info
+    */
+    
     res.status(200).json({ token });
   }
 }
@@ -527,6 +563,14 @@ passport.use(
       try {
         /* find the user specified in token */
         const user = await User.findById(payload.sub);
+
+        /*
+        console.log('payload=', payload);
+        payload= { iss: 'NodeAPI',
+                    sub: '5d9a1a10c112461dfc457a9f',
+                    iat: 1570545026023 }
+        console.log('sub=', payload.sub); // _id of user
+        */
 
         /* if user doesn't exist, handle it */
         if (!user) {
@@ -702,7 +746,53 @@ passport.use(
   )
 )
 
+final-final-final-final-final-final-final-final-final-final
+        
+z-----------------------------------------------------------------
+            step-9: PUT request: Modify / Update user Info
+
+z------- mongoose.connect(
+  {
+    useFindAndModify: false
+  }
+
+/* ========>  b/c: occur Error: DeprecationWarning: Mongoose: 
+  `findOneAndUpdate()` and `findOneAndDelete()` 
+  without the `useFindAndModify` option set to false 
+  are deprecated. 
+See: https://mongoosejs.com/docs/deprecations.html#-findandmodify-
+  */
+===> b/c we use  in router.put (./user.controller.js)
+
+    await User.findByIdAndUpdate(user._id, dataIsUpdated);
 
 
+z------- user.controller.js
+updateUser: async(req, res, next) => {
+  const user = req.user; // receive from passport.authenticate()
+  const token = await signToken(req.user);    
 
+   /* body is Put from Client */
+  const dataIsUpdated = req.body;
+
+  /* 
+  - dont use it, b/c _id in MongoB is ObjectId, not a String
+    await User.updateOne({user._id}, bodyFromClient); 
+  */
+  await User.findByIdAndUpdate(user._id, dataIsUpdated);
+
+  res.status(200).json({ token });
+}
+
+z------- user.route.js
+
+/* Requirement: User must be log in into their Profile
+=> therefore, they can update your profile
+=> need Token for authentication
+*/
+router.put(
+  '/user',
+  passport.authenticate('jwt', { session: false }),
+  UsersController.updateUser
+)
 

@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 
 // require json web token
 // https://github.com/auth0/node-jsonwebtoken
+// https://www.npmjs.com/package/jsonwebtoken
 const JWT = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/index');
 
@@ -17,7 +18,7 @@ signToken = user => {
   return JWT.sign(
     {
       iss: "NodeAPI", // issuer
-      sub: user.id, // sub means subject which is mandatory
+      sub: user.id, // sub means subject which is mandatory, = _id of user
       iat: new Date().getTime() // issued at date
     },
     JWT_SECRET // random secret
@@ -56,40 +57,101 @@ module.exports = {
       email,
       password,
       username
+      // bio: null,
+      // image: null
     });
 
-    // and await for a new user to be saved b/c it takes some time
-    // hash password before saving to database
     const salt = await bcrypt.genSalt(10);
-    // generate a password hash (salt + hash)
     const passwordHash = await bcrypt.hash(newUser.password, salt);
-    // save password is hashed to database
     newUser.password = passwordHash;
 
-    // after hashing password => add password is hashed to database
     await newUser.save();
     console.log('user is saved');
 
-    // use signToken method to generate token
-    // and respond on signup
     const token = await signToken(newUser);
     
     res.status(200).json({ token });
   },
 
   signin: async (req, res, next) => {
-    // Similar to signup method, we need to send token 
-    // as response so that the user can be authenticated.
-    
-    // respond with token: when user login => provide token to client
     const token = await signToken(req.user);
     res.status(200).json({ token });
   },
+
+  // get request , need only token on Header
   secret: async (req, res, next) => {
+    const token = await signToken(req.user);
+    const user = req.user;
+
+    const infoIsResponded = {
+      _id: user.id,
+      email: user.email,
+      username: user.username,
+      bio: user.bio,
+      image: user.image,
+      token
+    }
+
+    res.status(200).json( infoIsResponded );
+  },
+
+  updateUser: async(req, res, next) => {
+    const user = req.user; // receive from passport.authenticate()
     const token = await signToken(req.user);    
+
+    // body is Put from Client
+    const dataIsUpdated = req.body;
+
+    // dont use it, b/c _id in MongoB is ObjectId, not a String
+    //await User.updateOne({user._id}, bodyFromClient);
+    await User.findByIdAndUpdate(user._id, dataIsUpdated);
+
     res.status(200).json({ token });
   }
 }
+
+
+
+
+
+  /*
+  // REST API (everyone can access) -> don't need token
+  // replace or modify the entire info of user
+  replace: async (req, res, next) => {
+    // validate Request
+    if (!req.body.value) {
+      return res.status(400).send({
+        message: "Note content can nit be empty"
+      });
+    }
+
+    // otherwise, find one and update it with the request body
+    // syntax mongoose: A.findByIdAndUpdate(id, update, options)  // returns Query
+    User.findByIdAndUpdate(req.params.userId, {
+      req.body.value
+    }, { new: true })
+      .then(user => {
+        if (!user) {
+          return res.status(404).send({
+            message: "Note not fond with id" + req.params.userId
+          });
+        }
+        // otherwise
+        res.send(user);
+      }).catch(err => {
+        if (err.kind === 'ObjectId') {
+          return res.status(404).send({
+            message: "Note not found with id" + req.params.userId
+          });
+        }
+
+        return res.status(500).send({
+          message: "Error updating note with id" + req.params.userId
+        })
+      })
+  } */
+ 
+
 
 /*
   - First: Create a list of Middleware function

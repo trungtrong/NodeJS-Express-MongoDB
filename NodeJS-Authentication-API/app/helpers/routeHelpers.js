@@ -2,30 +2,21 @@ const Joi = require('joi');
 
 /*
   - We use this below validation inside routes/users.js
+  + validate all required info
 */
 
 module.exports = {
   validateBody: (schema) => {
     return (req, res, next) => {
-      // validate the incoming req.body using Joi.Validate()
-      // passing arguments - req.body and schema
       const result = Joi.validate(req.body, schema);
       console.log(req.body);
-      // on error
+      
       if (result.error) {
-        /*
-          respond with 400 status code and error in 
-            json format
-        */
+
         console.log(result.error);
         return res.status(400).json(result.error);
       }
 
-      /*
-        - attach value property to { res } object
-        - our goal is to use validated data
-        ( res.value.body ) instead of direct (res.body)
-      */
       if (!req.value) {
         req.value = {};
       }
@@ -41,7 +32,9 @@ module.exports = {
             .email()
             .required(),
         password: Joi.string().required(),
-        username: Joi.string()
+        username: Joi.string(),
+        bio: Joi.string(),
+        image: Joi.string()
       })
     }
 };
