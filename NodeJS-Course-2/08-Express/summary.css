@@ -134,7 +134,7 @@
 
   2 - To serve <static-files> such as images, CSS files, and JavaScript files
   => use <the-express.static> is the  built-in <middleware-function> in Express.
-                  express.static(root, [options])
+                  express.static(root_folder, [options])
     + We call <express.static-middleware-function>
 
     https://expressjs.com/en/4x/api.html#express.static

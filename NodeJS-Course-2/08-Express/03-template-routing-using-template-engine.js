@@ -4,6 +4,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
+// NOTEEEEEEEEE:   it is contrast (mandatory)
 app.get('/', (req, res) => {
   res.render('index');
 })

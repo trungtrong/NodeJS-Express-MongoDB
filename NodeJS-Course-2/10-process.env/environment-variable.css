@@ -1,0 +1,28 @@
+
+1 -  we can see Environment variables in Node environment
+  console.log(process.env);
+
+2 - We can add a new variable
+  
+  +  console.log(process.env);
+  and type:
+> SESSION_SECRET=12345678 node app.js
+
+3 - Using { dotenv } npm package
+
+  3-1. npm i dotenv --save-dev  
+
+  3-2. Create { .env } in root 
+      PORT=3000
+
+  3-3. in app.js
+    + require('dotenv').config()
+
+    + console.log(process.env.PORT);
+      => we have 3000
+
+/* 
+- search { dev stg prod environment }
+https://medium.com/wearetheledger/deploying-test-environments-with-azure-devops-eks-and-externaldns-67abe647e4e
+
+*/
